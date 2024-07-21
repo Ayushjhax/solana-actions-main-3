@@ -92,6 +92,8 @@ export const POST = async (req: Request) => {
     const requestUrl = new URL(req.url);
     const { amount, toPubkey } = validatedQueryParams(requestUrl);
 
+    console.log({requestUrl});
+
     const body: ActionPostRequest = await req.json();
 
     // validate the client provided input
@@ -106,7 +108,7 @@ export const POST = async (req: Request) => {
     }
 
     const connection = new Connection(
-      process.env.SOLANA_RPC! || clusterApiUrl("devnet"),
+      clusterApiUrl("devnet"),
     );
 
     // ensure the receiving account will be rent exempt
@@ -132,7 +134,7 @@ export const POST = async (req: Request) => {
       headers: ACTIONS_CORS_HEADERS,
     });
   } catch (err) {
-    console.log(err);
+    console.log("error=>",err);
     let message = "An unknown error occurred";
     if (typeof err == "string") message = err;
     return new Response(message, {
