@@ -25,7 +25,8 @@
   "dependencies": {
     "@changesets/cli": "^2.27.7",
     "@coral-xyz/anchor": "^0.30.1",
-    "cryptr": "^6.3.0"
+    "cryptr": "^6.3.0",
+    "weaviate-ts-client": "^2.2.0"
   },
   "contributors": [
     {
