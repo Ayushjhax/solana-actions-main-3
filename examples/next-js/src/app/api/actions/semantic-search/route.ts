@@ -21,19 +21,18 @@ async function semanticSearch(query: string, resultsLang: string = '') {
   console.log(`Searching for "${query}" in language: ${resultsLang || 'All'}`);
   return [
     {
-      title: "Sample Article",
-      url: "https://example.com",
-      text: "This is a sample article text.",
-      views: 1000,
-      lang: "en",
+      // title: "Sample Article",
+      // url: "https://example.com",
+      // text: "This is a sample article text.",
+      // views: 1000,
+      // lang: "en",
       _additional: { distance: 0.1 }
     }
   ];
 }
 
-// Server-side function to strip HTML tags
 const stripHtmlTags = (html: string): string => {
-  // Use an HTML parsing library for server-side environments
+
   const { parse } = require('node-html-parser');
   const root = parse(html);
   return root.textContent || "";
@@ -45,15 +44,15 @@ export const GET = async (req: Request): Promise<Response> => {
     const baseHref = new URL("/api/actions/semantic-search", requestUrl.origin).toString();
 
     const payload: ActionGetResponse = {
-      title: "Paid Multilingual Semantic Search",
-      icon: new URL("/search_icon.jpg", requestUrl.origin).toString(),
-      description: "Search for articles across multiple languages (costs 0.1 SEND)",
+      title: "Multilingual Semantic Search on Wikipedia",
+      icon: new URL("/blink_main.jpeg", requestUrl.origin).toString(),
+      description: "Search for articles across Wikipedia multiple languages (costs 1 SEND($0.06))",
       label: "Search",
       links: {
         actions: [
           {
             label: "Search Articles",
-            href: `${baseHref}?query={query}&language={language}`, // Use backticks
+            href: `${baseHref}?query={query}&language={language}`,
             parameters: [
               {
                 name: "query",
@@ -95,7 +94,6 @@ export const POST = async (req: Request): Promise<Response> => {
 
     const body: ActionPostRequest = await req.json();
 
-    // Validate the client provided input
     let account: PublicKey;
     try {
       account = new PublicKey(body.account);
@@ -107,26 +105,21 @@ export const POST = async (req: Request): Promise<Response> => {
     }
 
     const connection = new Connection(clusterApiUrl("mainnet-beta"));
-    const searchFee = 1_000_000; // 0.1 SEND (1_000_000 is 0.1 SEND in lamports)
+    const searchFee = 1_000_000; 
     const transaction = await createTransaction(connection, account, searchFee);
 
-    // Call the semantic search function
     const results = await semanticSearch(query, language);
 
-    // Fetch Wikipedia links
     const wikiResults = await fetchWikipediaLinks(query);
 
-    // Format the results into a string for display
     const formattedResults = results.map((result: any, index: number) =>
-      `${index + 1}. ${result.title}: ${result.url}` // Use backticks
+      `${index + 1}. ${result.title}: ${result.url}` 
     ).join('\n');
 
-    // Format the Wikipedia results into a string for display
     const formattedWikiResults = wikiResults.map((result: any, index: number) =>
-      ` ${index + 1}. ${result.title}: ${result.url} - ${stripHtmlTags(result.snippet)}` // Strip HTML tags
-    ).join('\n'); // Two newlines for separating entries
+      ` ${index + 1}. ${result.title}: ${result.url} - ${stripHtmlTags(result.snippet)}`
+    ).join('\n'); 
 
-    // Testing output
     console.log("Formatted Wiki Results:\n", formattedWikiResults);
 
     const payload: ActionPostResponse = await createPostResponse({
